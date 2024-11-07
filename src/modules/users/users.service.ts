@@ -24,7 +24,7 @@ export class UsersService {
     if(user) return true;
     return false;
   }
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto):Promise<any> {
     const {name,email,password,phone,address,image} = createUserDto;
     //check email
     const isExist= await this.isEmailExist(email)
@@ -41,7 +41,7 @@ export class UsersService {
     }
   }
 
-  async findAll(query: string,current: number, pageSize:number) {
+  async findAll(query: string,current: number, pageSize:number):Promise<any> {
     const {filter, sort} = aqp(query)
     if(filter.current) delete filter.current;
     if(filter.pageSize) delete filter.pageSize;
@@ -70,14 +70,14 @@ export class UsersService {
     }
   } 
 
-  findOne(id: number) {
+  async findOne(id: number):Promise<any> {
     return `This action returns a #${id} user`;
   }
-  async findByEmail(email: string){
+  async findByEmail(email: string):Promise<any> {
     return await this.userModel.findOne({email});
   }
 
-  async update(updateUserDto: UpdateUserDto) {
+  async update(updateUserDto: UpdateUserDto):Promise<any> {
     const updateData = { ...updateUserDto };
     if (updateData._id) {
       delete updateData._id; 
@@ -87,7 +87,7 @@ export class UsersService {
       { $set: updateData } 
     );
 }
-  async remove(_id: string) {
+  async remove(_id: string):Promise<any> {
     if(mongoose.isValidObjectId(_id)){
       return this.userModel.deleteOne({_id})
     }else{
@@ -95,7 +95,7 @@ export class UsersService {
     }
     
   }
-  async handleRegister(registerDto: CreateAuthDto){
+  async handleRegister(registerDto: CreateAuthDto):Promise<any> {
     const {name,email,password} = registerDto;
     //check email
     const isExist= await this.isEmailExist(email)
@@ -125,7 +125,7 @@ export class UsersService {
       _id: user._id
     }
   }
-  async handleActive(data: CodeAuthDto){
+  async handleActive(data: CodeAuthDto):Promise<any> {
     const user= await this.userModel.findOne({
       _id: data._id,
       codeId: data.code
@@ -144,7 +144,7 @@ export class UsersService {
       throw new BadRequestException("Mã code k hợp lệ hoặc hết hạn")
     }
   }
-  async retryActive(email: string) {
+  async retryActive(email: string):Promise<any> {
     const user= await this.userModel.findOne({email})
     if(!user){
       throw new BadRequestException("Tài khoản không tồn tại")
@@ -171,7 +171,7 @@ export class UsersService {
     })
     return {_id: user._id}
   }
-  async retryPassword(email: string) {
+  async retryPassword(email: string):Promise<any> {
     const user= await this.userModel.findOne({email})
     if(!user){
       throw new BadRequestException("Tài khoản không tồn tại")
@@ -196,7 +196,7 @@ export class UsersService {
     })
     return {_id: user._id, email: user.email}
   }
-  async changePassword(data: ChangePasswordAuthDto) {
+  async changePassword(data: ChangePasswordAuthDto):Promise<any> {
     if(data.confirmPassword != data.password){
       throw new BadRequestException("Không chính xác")
     }

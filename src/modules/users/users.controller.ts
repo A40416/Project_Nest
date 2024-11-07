@@ -14,7 +14,7 @@ export class UsersController {
 
   @Post()
   @Public()
-  @ApiOperation({ summary: 'Tạo mới người dùng' })
+  @ApiOperation({ summary: 'Tạo mới người dùng'})
   @ApiBody({ 
     type: CreateUserDto, 
     description: 'Dữ liệu tạo người dùng mới' 
@@ -27,7 +27,9 @@ export class UsersController {
     status: 400,
     description: 'Dữ liệu đầu vào không hợp lệ.',
   })
-  create(@Body() createUserDto: CreateUserDto) {
+  create(
+    @Body() createUserDto: CreateUserDto,
+  ):Promise<any> {
     return this.usersService.create(createUserDto);
   }
 
@@ -51,22 +53,28 @@ export class UsersController {
     @Query () query:string,
     @Query ("current") current:number,
     @Query ("pageSize") pageSize:number,
-  ) {
+  ):Promise<any> {
     return this.usersService.findAll(query,current,pageSize);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(
+    @Param('id') id: string,
+  ):Promise<any> {
     return this.usersService.findOne(+id);
   }
 
   @Patch()
-  async update(@Body() updateUserDto: UpdateUserDto) {
+  update(
+    @Body() updateUserDto: UpdateUserDto,
+  ):Promise<any> {
     return this.usersService.update(updateUserDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(
+    @Param('id') id: string,
+  ):Promise<any> {
     return this.usersService.remove(id);
   }
 }

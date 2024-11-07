@@ -50,6 +50,7 @@ import { TransformInterceptor } from './core/transform.interceptor';
       }),
       inject: [ConfigService],
     }),
+    FilesModule,
   ],
   controllers: [AppController],
   providers: [
