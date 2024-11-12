@@ -2,10 +2,13 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, 
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './passport/local-auth.guard';
 import { Public, responseMessage } from '@/decorator/customize';
-import { ChangePasswordAuthDto, CodeAuthDto, CreateAuthDto } from './dto/create-auth.dto';
+import {  CreateAuthDto } from './dto/create-auth.dto';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthLoginDto } from './dto/login-auth.dto';
+import { retryActiveDto } from './dto/retry-active.dto';
+import { CodeAuthDto } from './dto/check-code.dto';
+import { ChangePasswordAuthDto, SendCodeDto } from './dto/changepassword-auth.dto';
 
 @ApiTags('AUTH')
 @Controller('auth')
@@ -26,44 +29,89 @@ export class AuthController {
   @Public()
   @UseGuards((LocalAuthGuard))
   @responseMessage("Fetch login")
-  handleLogin(@Body(ValidationPipe) loginDto: AuthLoginDto)  {
+  handleLogin(
+    @Body(ValidationPipe) loginDto: AuthLoginDto,
+  ):Promise<any> {
     return this.authService.login(loginDto);
   }
 
   @Post('register')
   @Public()
-  register(@Body() registerDto: CreateAuthDto) {
+  @ApiResponse({
+    type: String,
+    status: 201,
+    description: 'Success',
+  })
+  @ApiOperation({ summary: `Đăng kí` })
+  register(
+    @Body() registerDto: CreateAuthDto,
+  ):Promise<any> {
     return this.authService.handlRegister(registerDto);
   }
 
-  @Post('check-code')
-  @Public()
-  checkCode(@Body() registerDto: CodeAuthDto) {
-    return this.authService.checkCode(registerDto);
-  }
 
   @Post('retry-active')
   @Public()
-  retryActive(@Body("email") email: string) {
+  @ApiOperation({ summary: `Send code kích hoạt tài khoản` })
+  @ApiResponse({
+    type: String,
+    status: 201,
+    description: 'Đã gửi code',
+  })
+  retryActive(
+    @Body() emailDto: retryActiveDto,
+  ):Promise<any> {
+    const email = emailDto.email;
     return this.authService.retryActive(email);
+  }
+
+  @Post('check-code')
+  @ApiResponse({
+    type: String,
+    status: 201,
+    description: 'Đã kích hoạt tài khoản',
+  })
+  @ApiOperation({ summary: `Check code -  kích hoạt tài khoản` })
+  @Public()
+  checkCode(
+    @Body() registerDto: CodeAuthDto,
+  ):Promise<any> {
+    return this.authService.checkCode(registerDto);
   }
 
   @Post('retry-password')
   @Public()
-  retryPassword(@Body() data: ChangePasswordAuthDto) {
-    return this.authService.changePassword(data);
+  @ApiOperation({ summary: `Quên mật khẩu tài khoản - send code` })
+  @ApiResponse({
+    type: String,
+    status: 201,
+    description: 'Code đã được gửi',
+  })
+  retryPassword(
+    @Body() emailDto: SendCodeDto,
+  ):Promise<any> {
+    const email = emailDto.email;
+    return this.authService.retryPassword(email);
   }
 
   @Post('change-password')
   @Public()
-  changePassword(@Body("email") email: string) {
-    return this.authService.retryPassword(email);
+  @ApiOperation({ summary: `Thay đổi mật khẩu tài khoản`})
+  @ApiResponse({
+    type: String,
+    status: 201,
+    description: 'Mật khẩu đã được thay đổi',
+  })
+  changePassword(
+    @Body() data: ChangePasswordAuthDto,
+  ):Promise<any> {
+    return this.authService.changePassword(data);
   }
 
 
   @Get('mail')
-  @ApiBearerAuth()
   @Public()
+  @ApiOperation({ summary: `Gửi email test ^^`})
   testMail() {
     this.mailerService
       .sendMail({

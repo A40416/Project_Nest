@@ -9,8 +9,11 @@ import aqp from 'api-query-params';
 import mongoose from 'mongoose';
 import { v4 as uuidv4 } from 'uuid'
 import dayjs from 'dayjs';
-import { ChangePasswordAuthDto, CodeAuthDto, CreateAuthDto } from '@/auth/dto/create-auth.dto';
+import { CreateAuthDto } from '@/auth/dto/create-auth.dto';
 import { MailerService } from '@nestjs-modules/mailer';
+import { retryActiveDto } from '@/auth/dto/retry-active.dto';
+import { CodeAuthDto } from '@/auth/dto/check-code.dto';
+import { ChangePasswordAuthDto } from '@/auth/dto/changepassword-auth.dto';
 
 @Injectable()
 export class UsersService {

@@ -38,17 +38,17 @@ export class UsersController {
     status: 200,
     description: 'Success',
   })
-  @ApiOperation({ summary: 'Xem User' })
+  @ApiOperation({ summary: 'Xem Users' })
   @ApiQuery({
     name: 'current',
     description: `Số trang`,
     required: true,
-})
+  })
   @ApiQuery({
     name: 'pageSize',
     description: `Số user trên 1 trang`,
     required: true,
-})
+  })
   async findAll(
     @Query () query:string,
     @Query ("current") current:number,
@@ -58,6 +58,11 @@ export class UsersController {
   }
 
   @Get(':id')
+  @ApiResponse({
+    status: 200,
+    description: 'Success',
+  })
+  @ApiOperation({ summary: 'Tìm User theo Id' })
   findOne(
     @Param('id') id: string,
   ):Promise<any> {
@@ -65,6 +70,11 @@ export class UsersController {
   }
 
   @Patch()
+  @ApiOperation({ summary: 'Update User' })
+  @ApiResponse({
+    status: 200,
+    description: 'Success',
+  })
   update(
     @Body() updateUserDto: UpdateUserDto,
   ):Promise<any> {
@@ -72,6 +82,11 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @ApiOperation({ summary: 'Delete User' })
+  @ApiResponse({
+    status: 200,
+    description: 'Xóa Thành Công',
+  })
   remove(
     @Param('id') id: string,
   ):Promise<any> {
