@@ -9,7 +9,6 @@ interface FileDTO {
   email: string;
   password: string;
 }
-
 @Injectable()
 export class FilesService {
   constructor(
