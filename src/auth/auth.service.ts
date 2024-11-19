@@ -6,6 +6,7 @@ import { CreateAuthDto } from './dto/create-auth.dto';
 import { retryActiveDto } from './dto/retry-active.dto';
 import { CodeAuthDto } from './dto/check-code.dto';
 import { ChangePasswordAuthDto } from './dto/changepassword-auth.dto';
+import { Cron } from '@nestjs/schedule';
 
 
 @Injectable()
@@ -47,5 +48,13 @@ export class AuthService {
   }
   changePassword = async(data: ChangePasswordAuthDto):Promise<any> => {
     return await this.usersService.changePassword(data);
+  }
+  sendTestEmail = async() => {
+    return await this.usersService.sendTestEmail();
+  }
+  @Cron('0 30 11 * * 1-5') 
+  async scheduleTestEmail() {
+    await this.sendTestEmail();
+    console.log('Scheduled email sent every minute!');
   }
 }

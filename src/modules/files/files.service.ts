@@ -1,26 +1,40 @@
-import { Injectable } from '@nestjs/common';
-import { CreateFileDto } from './dto/create-file.dto';
-import { UpdateFileDto } from './dto/update-file.dto';
+import { Injectable, BadRequestException } from '@nestjs/common';
+import * as XLSX from 'xlsx';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { File } from './entities/file.entity';
+
+interface FileDTO {
+  name: string;
+  email: string;
+  password: string;
+}
 
 @Injectable()
 export class FilesService {
-  create(createFileDto: CreateFileDto) {
-    return 'This action adds a new file';
-  }
+  constructor(
+    @InjectModel(File.name) private readonly FileModel: Model<File>,
+  ) {}
 
-  findAll() {
-    return `This action returns all files`;
-  }
+  async processExcelFile(buffer: Buffer): Promise<File[]> {
+    try {
+      const workbook = XLSX.read(buffer, { type: 'buffer' });
 
-  findOne(id: number) {
-    return `This action returns a #${id} file`;
-  }
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
 
-  update(id: number, updateFileDto: UpdateFileDto) {
-    return `This action updates a #${id} file`;
-  }
+      const data: FileDTO[] = XLSX.utils.sheet_to_json(sheet, {
+        header: ['name', 'email', 'password'],
+      });
 
-  remove(id: number) {
-    return `This action removes a #${id} file`;
+      if (!data || data.length === 0) {
+        throw new BadRequestException('File Excel không chứa dữ liệu hợp lệ.');
+      }
+
+      const Files = await this.FileModel.insertMany(data);
+      return Files;
+    } catch (error) {
+      throw new BadRequestException('Xử lý file Excel thất bại.');
+    }
   }
 }

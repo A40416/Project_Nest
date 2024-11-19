@@ -14,6 +14,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { retryActiveDto } from '@/auth/dto/retry-active.dto';
 import { CodeAuthDto } from '@/auth/dto/check-code.dto';
 import { ChangePasswordAuthDto } from '@/auth/dto/changepassword-auth.dto';
+import { CloudinaryService } from '@/cloudinary/cloudinary.service';
 
 @Injectable()
 export class UsersService {
@@ -21,6 +22,7 @@ export class UsersService {
     @InjectModel(User.name) 
     private userModel: Model<User>,
     private readonly mailerService: MailerService,
+    private readonly cloudinaryService: CloudinaryService,
   ){}
   isEmailExist= async(email: string) =>{
     const user= await this.userModel.exists({email});
@@ -225,5 +227,21 @@ export class UsersService {
       throw new BadRequestException("Mã code k hợp lệ hoặc hết hạn")
     }
     
+  }
+  async uploadUserImage(file: Express.Multer.File) {
+    return this.cloudinaryService.uploadImage(file);
+  }
+  async sendTestEmail() {
+    await this.mailerService.sendMail({
+      to: 'leevinh.cntt@gmail.com', // list of receivers
+      subject: 'Hellu Vinh Sôkiuu', // Subject line
+      text: 'welcome', // plaintext body
+      template: 'mails', // Template file name
+      context: {
+        name: 'Vinh',
+        activationCode: 123,
+      },
+    });
+    console.log('Test email sent successfully!');
   }
 }

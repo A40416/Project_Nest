@@ -108,7 +108,7 @@ export class AuthController {
     return this.authService.changePassword(data);
   }
 
-
+  @ApiTags('MAIL')
   @Get('mail')
   @Public()
   @ApiOperation({ summary: `Gửi email test ^^`})
@@ -125,5 +125,14 @@ export class AuthController {
         }
       })
     return "ok";
+  }
+
+  @ApiTags('MAIL')
+  @Get('test')
+  @Public()
+  @ApiOperation({ summary: `Gửi email test theo lịch`})
+  testMailschedule() {
+    this.authService.sendTestEmail();
+    return 'ok';
   }
 }
